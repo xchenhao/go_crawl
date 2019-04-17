@@ -5,20 +5,13 @@ import (
 	"github.com/astaxie/beego/orm"
 	"regexp"
 	"strings"
-	"fmt"
 )
-
-const DB_HOST = "127.0.0.1"
-const DB_PORT = 3306
-const DB_NAME = "test"
-const DB_USER = "root"
-const DB_PWD = "123456"
 
 var (
-	db orm.Ormer
+	dbConnection orm.Ormer = GetConnection(new(MovieInfo))
 )
 
-type MovieInfo struct{ 
+type MovieInfo struct {
   Id int64
   Movie_id int64
   Movie_name string
@@ -34,25 +27,30 @@ type MovieInfo struct{
   Movie_grade string
 }
 
-func init() {
-	orm.Debug = true // 是否开启调试模式 调试模式下会打印出sql语句
-	var dbDsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8", DB_USER, DB_PWD, DB_HOST, DB_PORT, DB_NAME)
-	orm.RegisterDataBase("default", "mysql", dbDsn, 30)
-	orm.RegisterModel(new(MovieInfo))
-	db = orm.NewOrm()
-}
+func AddMovie(sMovieHtml string) (int64, error) {
+	movieName := GetMovieName(sMovieHtml)
+	if "" == movieName {
+		return 0, nil
+	}
+	// 记录电影信息
+	var model MovieInfo
+	model.Movie_name            = movieName
+	model.Movie_director        = GetMovieDirector(sMovieHtml)
+	model.Movie_main_character  = GetMovieMainCharacters(sMovieHtml)
+	model.Movie_type            = GetMovieGenre(sMovieHtml)
+	model.Movie_on_time         = GetMovieOnTime(sMovieHtml)
+	model.Movie_grade           = GetMovieGrade(sMovieHtml)
+	model.Movie_span            = GetMovieRunningTime(sMovieHtml)
+	model.Id = 0
 
-func AddMovie(movie_info *MovieInfo)(int64,error){
-	movie_info.Id = 0
-	id,err := db.Insert(movie_info)
-	return id,err
+	id, err := dbConnection.Insert(&model)
+	return id, err
 }
 
 func GetMovieDirector(movieHtml string) string{
 	if movieHtml == ""{
 		return ""
 	}
-
 
 	reg := regexp.MustCompile(`<a.*?rel="v:directedBy">(.*?)</a>`)
 	result := reg.FindAllStringSubmatch(movieHtml, -1)
