@@ -1,11 +1,11 @@
 package routers
 
 import (
-	"crawl_movie/controllers"
+	"go_crawl/controllers"
 	"github.com/astaxie/beego"
 )
 
 func init() {
     beego.Router("/", &controllers.MainController{})
-    beego.Router("/crawl_movie", &controllers.CrawlMovieController{}, "*:CrawlMovie")
+    beego.Router("/crawl", &controllers.CrawlMovieController{}, "*:CrawlMovie")
 }

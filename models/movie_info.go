@@ -12,7 +12,7 @@ const DB_HOST = "127.0.0.1"
 const DB_PORT = 3306
 const DB_NAME = "test"
 const DB_USER = "root"
-const DB_PWD = "123"
+const DB_PWD = "123456"
 
 var (
 	db orm.Ormer
