@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "go_crawl/routers"
+	_ "github.com/xchenhao/go_crawl/routers"
 	"github.com/astaxie/beego"
 )
 

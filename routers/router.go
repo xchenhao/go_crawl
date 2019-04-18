@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"go_crawl/controllers"
+	"github.com/xchenhao/go_crawl/controllers"
 	"github.com/astaxie/beego"
 )
 

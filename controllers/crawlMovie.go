@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"go_crawl/models"
+	"github.com/xchenhao/go_crawl/models"
 	"github.com/astaxie/beego"
+	"github.com/xchenhao/go_crawl/utils"
 	"time"
-	"go_crawl/utils"
 )
 
 type CrawlMovieController struct {
