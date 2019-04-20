@@ -6,29 +6,30 @@ import (
 
 const (
 	REDIS_HOST = "127.0.0.1:6379"
-	KEY_URL_QUEUE = "movie_url_queue"
-	KEY_URL_VISIT_SET = "movie_url_visited_set"
 )
 
 var (
 	client goredis.Client
 )
 
-// 连接至 Redis
-func ConnectRedis(addr string) {
+func init()  {
+	connectRedis(REDIS_HOST)
+}
+
+func connectRedis(addr string) {
 	client.Addr = addr
 	// client.Db = 1
 	// client.Password = ""
 }
 
 // 将要爬取的 URL 放入队列
-func PutinQueue(url string){
-	client.Lpush(KEY_URL_QUEUE, []byte(url))
+func PutinQueue(url, key string){
+	client.Lpush(key, []byte(url))
 }
 
 // 从队列中取出一个 URL
-func PopfromQueue() string {
-	res, err := client.Rpop(KEY_URL_QUEUE)
+func PopfromQueue(key string) string {
+	res, err := client.Rpop(key)
 	if err != nil {
 		panic(err)
 	}
@@ -37,8 +38,8 @@ func PopfromQueue() string {
 }
 
 // 获取队列长度
-func GetQueueLength() int {
-	length, err := client.Llen(KEY_URL_QUEUE)
+func GetQueueLength(key string) int {
+	length, err := client.Llen(key)
 	if err != nil {
 		return 0
 	}
@@ -47,13 +48,34 @@ func GetQueueLength() int {
 }
 
 // 将已访问过的 URL 放入集合当中
-func AddToSet(url string){
-	client.Sadd(KEY_URL_VISIT_SET, []byte(url))
+func AddToSet(url, key string) {
+	client.Sadd(key, []byte(url))
+}
+
+func RmFromSet(url, key string) {
+	client.Srem(key, []byte(url))
+}
+
+func GetSetLenth(key string) int {
+	length, err := client.Scard(key)
+	if err != nil {
+		return 0
+	}
+
+	return length
+}
+
+func PopFromSet(key string) string{
+	item, err := client.Spop(key)
+	if nil != err {
+		return ""
+	}
+	return string(item)
 }
 
 // 判断 URL 是否已访问过
-func IsVisit(url string) bool {
-	bIsVisit, err := client.Sismember(KEY_URL_VISIT_SET, []byte(url))
+func IsVisit(url, key string) bool {
+	bIsVisit, err := client.Sismember(key, []byte(url))
 	if err != nil {
 		return false
 	}

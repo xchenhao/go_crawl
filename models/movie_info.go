@@ -2,13 +2,13 @@ package models
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/astaxie/beego/orm"
 	"regexp"
 	"strings"
 )
 
-var (
-	dbConnection orm.Ormer = GetConnection(new(MovieInfo))
+const (
+	KEY_DOUBAN_MOVIE_URL_QUEUE = "movie_url_queue"
+	KEY_DOUBAN_MOVIE_URL_VISIT_SET = "movie_url_visited_set"
 )
 
 type MovieInfo struct {
@@ -43,7 +43,7 @@ func AddMovie(sMovieHtml string) (int64, error) {
 	model.Movie_span            = GetMovieRunningTime(sMovieHtml)
 	model.Id = 0
 
-	id, err := dbConnection.Insert(&model)
+	id, err := GetConnection(new(MovieInfo), "default2").Insert(&model)
 	return id, err
 }
 

@@ -2,14 +2,25 @@ package utils
 
 import "github.com/astaxie/beego/httplib"
 
-func Get(url string, ua string, cookie string) string {
+func Get(url string, headers map[string]string) string {
 	rsp := httplib.Get(url)
+	for k, v := range headers {
+		rsp.Header(k, v)
+	}
 
-	rsp.Header("User-Agent", ua)
-	rsp.Header("Cookie", cookie)
 	htmlContent, err := rsp.String()
 	if err != nil {
 		panic(err)
 	}
 	return htmlContent
+}
+
+func InArray(item string, array []string) bool {
+	for _, v := range array {
+		if item == v {
+			return true
+		}
+		continue
+	}
+	return false
 }
